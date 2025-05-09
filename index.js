@@ -24,6 +24,40 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// Add a route for `/api` to handle requests without a parameter
+app.get('/api', (req, res) => {
+  const date = new Date();
+
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString(),
+  });
+});
+
+// Keep the `/api/:date?` route for handling requests with a parameter
+app.get('/api/:date?', (req, res) => {
+  const dateParam = req.params.date;
+
+  let date;
+  if (!isNaN(dateParam)) {
+    // If dateParam is a Unix timestamp
+    date = new Date(parseInt(dateParam));
+  } else {
+    // Otherwise, try to parse as a date string
+    date = new Date(dateParam);
+  }
+
+  // Check if the date is valid
+  if (date.toString() === 'Invalid Date') {
+    return res.json({ error: 'Invalid Date' });
+  }
+
+  // Return the Unix and UTC timestamps
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString(),
+  });
+});
 
 
 // Listen on port set in environment variable or default to 3000
